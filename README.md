@@ -11,9 +11,12 @@ O site foi construído em arquitetura estática leve e de alta performance, sem 
 ```text
 ├── index.html       # Estrutura semântica HTML5, arte SVG original e tags meta
 ├── style.css        # Identidade visual 90s, responsividade, scanlines e animações
-├── script.js        # Lógica de interações, validação segura e rastreador GA4
+├── script.js        # Lógica de interações, validação segura, GA4 e Cloud Firestore
+├── firebase.json    # Configurações do Firebase e Cloud Firestore
+├── firestore.rules  # Regras de segurança do Cloud Firestore
+├── .firebaserc      # Mapeamento do projeto mundo-espiritual-1994
 ├── vercel.json      # Configurações de cabeçalhos e URLs limpas para a Vercel
-└── README.md        # Guia completo de execução, GA4 e publicação
+└── README.md        # Guia completo de execução, GA4, Firestore e publicação
 ```
 
 ---
@@ -157,7 +160,27 @@ O projeto já está estruturado e configurado com [`vercel.json`](file:///c:/Use
    ```
 3. Acesse [vercel.com](https://vercel.com) e clique em **Add New > Project**.
 4. Importe o repositório do GitHub.
-5. A Vercel detectará automaticamente que se trata de um site estático e fará o deploy com URL pública em segundos.
+---
+
+## 🔥 8. Banco de Dados Cloud Firestore
+
+O projeto está conectado ao banco de dados NoSQL **Cloud Firestore**:
+
+- **Projeto do Firebase:** `mundo-espiritual-1994`
+- **Nome do Aplicativo:** `Arquivos do Mundo Espiritual`
+- **Coleção de Leads:** `recrutamento_agentes`
+- **Campos armazenados por cadastro:**
+  - `email`: Endereço de e-mail do agente cadastrado
+  - `criado_em`: Timestamp do servidor Firebase
+  - `origem`: `'landing_page_arquivos'`
+  - `status`: `'pendente'`
+- **Regras de Segurança (`firestore.rules`):**  
+  Permite que qualquer visitante insira (`create`) seu cadastro com validação de formato de e-mail, mas impede leituras públicas (`read: false`), garantindo a privacidade dos dados cadastrados.
+
+### Visualizando os Cadastros no Console:
+1. Acesse o [Console do Firebase](https://console.firebase.google.com/project/mundo-espiritual-1994/firestore).
+2. Clique em **Firestore Database** no menu lateral.
+3. Acesse a coleção **`recrutamento_agentes`** para ver todos os e-mails registrados em tempo real.
 
 ---
 

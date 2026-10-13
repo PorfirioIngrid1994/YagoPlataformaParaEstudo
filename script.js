@@ -13,6 +13,34 @@
    ============================================================================ */
 const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
 
+/* ============================================================================
+   CONFIGURAÇÃO DO CLOUD FIRESTORE (FIREBASE)
+   Projeto criado e conectado: mundo-espiritual-1994
+   ============================================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBkEcVnXkMl60IbfLVKAroviFG9rixD_Qk",
+  authDomain: "mundo-espiritual-1994.firebaseapp.com",
+  projectId: "mundo-espiritual-1994",
+  storageBucket: "mundo-espiritual-1994.firebasestorage.app",
+  messagingSenderId: "60008323124",
+  appId: "1:60008323124:web:b4125a529d4e7b99489261"
+};
+
+let firestoreDb = null;
+try {
+  if (typeof firebase !== 'undefined' && firebase.initializeApp) {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    firestoreDb = firebase.firestore();
+    console.info(
+      '%c[Cloud Firestore]%c Conectado ao projeto "mundo-espiritual-1994".',
+      'background: #FFA000; color: #000; font-weight: bold; padding: 2px 6px;',
+      'color: #7CFF9B;'
+    );
+  }
+} catch (fbErr) {
+  console.warn('[Cloud Firestore] Inicialização do Firebase:', fbErr);
+}
+
 /**
  * Estado Global e Flags de Controle de Eventos Únicos
  */
@@ -326,6 +354,29 @@ function setupFormRecruitment() {
     if (submitBtn) submitBtn.disabled = true;
     if (submitSpinner) submitSpinner.hidden = false;
 
+    // Grava o e-mail no Cloud Firestore (Coleção: recrutamento_agentes)
+    if (firestoreDb && typeof firebase !== 'undefined') {
+      try {
+        firestoreDb.collection('recrutamento_agentes').add({
+          email: rawValue,
+          criado_em: firebase.firestore.FieldValue.serverTimestamp(),
+          origem: 'landing_page_arquivos',
+          status: 'pendente'
+        }).then((docRef) => {
+          console.info(
+            '%c[Cloud Firestore]%c Registro de agente gravado com sucesso! ID:',
+            'background: #FFA000; color: #000; font-weight: bold; padding: 2px 6px;',
+            'color: #7CFF9B; font-weight: bold;',
+            docRef.id
+          );
+        }).catch((dbErr) => {
+          console.warn('[Cloud Firestore] Falha ao gravar no Firestore:', dbErr);
+        });
+      } catch (err) {
+        console.warn('[Cloud Firestore] Exceção ao acessar Firestore:', err);
+      }
+    }
+
     // Simulação visual de envio (pequeno delay de 450ms para sensação de transmissão ao vivo)
     setTimeout(() => {
       if (submitBtn) submitBtn.disabled = false;
@@ -339,7 +390,7 @@ function setupFormRecruitment() {
         simulated_status: 'success'
       });
 
-      // Limpa o valor digitado (garantindo que nada fique armazenado)
+      // Limpa o valor digitado do campo
       emailInput.value = '';
 
       // Oculta o formulário e exibe a mensagem de sucesso no site
